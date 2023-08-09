@@ -3,6 +3,7 @@ package com.aml.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.aml.dto.PersonDto;
 import com.aml.entity.Person;
+import com.aml.helper.Indices;
 import com.aml.repository.PersonRepository;
 import com.aml.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +38,7 @@ public class PersonService {
     public void save(PersonDto dto) {
         Person person = modelMapper.map(dto, Person.class);
         person = personRepository.save(person);
-        IndexRequest insert = new IndexRequest("person")
+        IndexRequest insert = new IndexRequest(Indices.PERSON_INDEX)
                 .id(person.getId()+"")
                 .source(JsonUtil.toJsonString(person), XContentType.JSON);
         try {
@@ -54,7 +55,7 @@ public class PersonService {
     // get Person from elastic search
     public Person getPersonById(Long id) {
         GetRequest request = new GetRequest();
-        request.index("person");
+        request.index(Indices.PERSON_INDEX);
         request.id(id + "");
 
         try {
