@@ -29,4 +29,13 @@ public class PersonController {
     public ResponseEntity<?> getAll() {
         return new ResponseEntity<>(personService.getAll(), HttpStatus.OK);
     }
+
+    @PostMapping("/delete")
+    public ResponseEntity<?> deletePerson(@RequestParam Long id) {
+        Boolean result = personService.deletePerson(id);
+        if (result)
+            return new ResponseEntity<>("Deleted", HttpStatus.OK);
+        else
+            return new ResponseEntity<>("Failed to delete", HttpStatus.BAD_REQUEST);
+    }
 }

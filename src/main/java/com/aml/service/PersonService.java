@@ -7,6 +7,9 @@ import com.aml.repository.PersonRepository;
 import com.aml.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -23,6 +26,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +98,21 @@ public class PersonService {
         } catch (IOException e) {
             log.error("Error while retrieve person from elastic search {}","Can not get list person", e);
             return new ArrayList<>();
+        }
+    }
+
+    @Transactional
+    public boolean deletePerson(Long id) {
+        personRepository.deleteById(id);
+        DeleteRequest deleteRequest = new DeleteRequest()
+                .index(Indices.PERSON_INDEX)
+                .id(id + "");
+        try {
+            DeleteResponse response = restClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            return response.getResult() == DocWriteResponse.Result.DELETED;
+        } catch (IOException e) {
+            log.error("Error while delete person from elastic search {}","Can not delete person", e);
+            return false;
         }
     }
 
