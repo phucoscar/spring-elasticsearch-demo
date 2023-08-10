@@ -78,7 +78,7 @@ public class PersonService {
     }
 
     public List<Person> getAll() {
-        SearchRequest searchRequest = new SearchRequest();
+        SearchRequest searchRequest = new SearchRequest(Indices.PERSON_INDEX);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(QueryBuilders.matchAllQuery());
         searchRequest.source(sourceBuilder);
